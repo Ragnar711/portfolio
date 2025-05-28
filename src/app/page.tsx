@@ -9,13 +9,34 @@ import {
     Download,
     Menu,
     X,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import Image from "next/image";
+
 import drone from "../../public/drone.jpg";
+import drone1 from "../../public/drone1.png";
+
+import agv from "../../public/agv.png";
+import agv1 from "../../public/agv1.png";
+import agv2 from "../../public/agv2.png";
+import agv3 from "../../public/agv3.png";
+
+import mes from "../../public/mes.png";
+import mes4 from "../../public/mes4.png";
+import mes5 from "../../public/mes5.png";
+import mes6 from "../../public/mes6.png";
+import mes_andon from "../../public/mes_andon.png";
+import mes1 from "../../public/mes1.png";
+import mes2 from "../../public/mes2.png";
+import mes3 from "../../public/mes3.png";
 
 const Page = () => {
     const [activeSection, setActiveSection] = useState("home");
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState<{
+        [key: number]: number;
+    }>({});
 
     // Navigation items
     const navItems = [
@@ -25,14 +46,14 @@ const Page = () => {
         { id: "contact", label: "Contact" },
     ];
 
-    // Sample projects data - easily editable
+    // Sample projects data - easily editable with multiple images per project
     const projects = [
         {
             id: 1,
             title: "Autonomous Land Drone Navigation",
             description:
                 "Implemented an autonomous GPS-based navigation system for a land drone using ROS2 and Ubuntu server. Developed custom sensor drivers for sonar and motor encoders, optimized odometry and obstacle detection, and enabled multi-drone communication.",
-            image: drone,
+            images: [drone, drone1], // Add more images here: [drone, drone2, drone3]
             github: "https://github.com/Ragnar711/land_drone",
             demo: "https://your-demo-link.com",
             tags: [
@@ -41,6 +62,42 @@ const Page = () => {
                 "Robotics",
                 "Sensor Integration",
                 "Autonomous Systems",
+            ],
+        },
+        {
+            id: 2,
+            title: "Automated Guided Vehicle (AGV) Control System",
+            description:
+                "Developed a software interface for an industrial AGV used on a production line. Built a Python backend to enable communication with the AGV hardware through websockets, a React web dashboard for live monitoring and control, and a React Native mobile app for manual driving and feedback.",
+            images: [agv, agv1, agv2, agv3], // Add more images here: [agv, agv2, agv3]
+            github: "",
+            demo: "",
+            tags: [
+                "Python",
+                "React",
+                "React Native",
+                "Expo",
+                "WebSockets",
+                "Industrial Automation",
+            ],
+        },
+        {
+            id: 3,
+            title: "Manufacturing Execution System (MES)",
+            description:
+                "Designed and implemented a modular MES system using a microservices architecture. Built a React frontend and NestJS backend with MySQL managed via Prisma. Integrated industrial machines via OPC UA, connected ERP systems like SAP and Sage, and exposed RESTful APIs and WebSocket servers for real-time communication. Applications were containerized with Docker and deployed using GitLab CI/CD pipelines on Linux.",
+            images: [mes, mes4, mes5, mes6, mes_andon, mes1, mes2, mes3], // Add more images here: [mes, mes2, mes3]
+            github: "",
+            demo: "",
+            tags: [
+                "MES",
+                "OPC UA",
+                "React",
+                "NestJS",
+                "MySQL",
+                "Docker",
+                "CI/CD",
+                "ERP Integration",
             ],
         },
     ];
@@ -71,6 +128,28 @@ const Page = () => {
         if (element) {
             element.scrollIntoView({ behavior: "smooth" });
         }
+    };
+
+    const nextImage = (projectId: number, totalImages: number) => {
+        setCurrentImageIndex((prev) => ({
+            ...prev,
+            [projectId]: ((prev[projectId] || 0) + 1) % totalImages,
+        }));
+    };
+
+    const prevImage = (projectId: number, totalImages: number) => {
+        setCurrentImageIndex((prev) => ({
+            ...prev,
+            [projectId]:
+                ((prev[projectId] || 0) - 1 + totalImages) % totalImages,
+        }));
+    };
+
+    const goToImage = (projectId: number, imageIndex: number) => {
+        setCurrentImageIndex((prev) => ({
+            ...prev,
+            [projectId]: imageIndex,
+        }));
     };
 
     return (
@@ -176,66 +255,137 @@ const Page = () => {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {projects.map((project) => (
-                            <div
-                                key={project.id}
-                                className="bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-                            >
-                                <Image
-                                    src={project.image}
-                                    alt={project.title}
-                                    width={400}
-                                    height={300}
-                                />
-                                <div className="p-6">
-                                    <h3 className="text-xl font-bold mb-3">
-                                        {project.title}
-                                    </h3>
-                                    <p className="text-gray-600 mb-4 leading-relaxed">
-                                        {project.description}
-                                    </p>
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        {project.tags.map((tag) => (
-                                            <span
-                                                key={tag}
-                                                className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full"
-                                            >
-                                                {tag}
-                                            </span>
-                                        ))}
+                    <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-4">
+                        {projects.map((project) => {
+                            const currentIndex =
+                                currentImageIndex[project.id] || 0;
+                            const hasMultipleImages = project.images.length > 1;
+
+                            return (
+                                <div
+                                    key={project.id}
+                                    className="bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                                >
+                                    {/* Image Carousel */}
+                                    <div className="relative h-72 sm:h-96 bg-gray-200 flex justify-center items-center">
+                                        <Image
+                                            src={project.images[currentIndex]}
+                                            alt={`${project.title} - Image ${
+                                                currentIndex + 1
+                                            }`}
+                                            fill
+                                            className="object-contain"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 85vw, 65vw"
+                                        />
+
+                                        {/* Navigation arrows - only show if multiple images */}
+                                        {hasMultipleImages && (
+                                            <>
+                                                <button
+                                                    onClick={() =>
+                                                        prevImage(
+                                                            project.id,
+                                                            project.images
+                                                                .length
+                                                        )
+                                                    }
+                                                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1.5 rounded-full hover:bg-opacity-70 transition-opacity"
+                                                >
+                                                    <ChevronLeft size={20} />
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        nextImage(
+                                                            project.id,
+                                                            project.images
+                                                                .length
+                                                        )
+                                                    }
+                                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1.5 rounded-full hover:bg-opacity-70 transition-opacity"
+                                                >
+                                                    <ChevronRight size={20} />
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {/* Dots indicator - only show if multiple images */}
+                                        {hasMultipleImages && (
+                                            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
+                                                {project.images.map(
+                                                    (_, index) => (
+                                                        <button
+                                                            key={index}
+                                                            onClick={() =>
+                                                                goToImage(
+                                                                    project.id,
+                                                                    index
+                                                                )
+                                                            }
+                                                            aria-label={`Go to image ${
+                                                                index + 1
+                                                            }`}
+                                                            className={`w-2 h-2 rounded-full transition-colors ${
+                                                                index ===
+                                                                currentIndex
+                                                                    ? "bg-white"
+                                                                    : "bg-white bg-opacity-50"
+                                                            }`}
+                                                        />
+                                                    )
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="flex space-x-4">
-                                        <a
-                                            href={project.github}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
-                                        >
-                                            <Github
-                                                size={20}
-                                                className="mr-2"
-                                            />
-                                            Code
-                                        </a>
-                                        {project.demo && (
+
+                                    <div className="p-6">
+                                        <h3 className="text-xl font-bold mb-3">
+                                            {project.title}
+                                        </h3>
+                                        <p className="text-gray-600 mb-4 leading-relaxed">
+                                            {project.description}
+                                        </p>
+                                        <div className="flex flex-wrap gap-2 mb-4">
+                                            {project.tags.map((tag) => (
+                                                <span
+                                                    key={tag}
+                                                    className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full"
+                                                >
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <div className="flex space-x-4">
                                             <a
-                                                href={project.demo}
+                                                href={project.github}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
                                             >
-                                                <ExternalLink
+                                                <Github
                                                     size={20}
                                                     className="mr-2"
                                                 />
-                                                Demo
+                                                Code
                                             </a>
-                                        )}
+                                            {project.demo && (
+                                                <a
+                                                    href={project.demo}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
+                                                >
+                                                    <ExternalLink
+                                                        size={20}
+                                                        className="mr-2"
+                                                    />
+                                                    Demo
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>
